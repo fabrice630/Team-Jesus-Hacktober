@@ -4,16 +4,28 @@ DevAid AI is an accessible debugging workspace for developers. It turns a code s
 
 ## Run locally
 
+### Backend
+
+```bash
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[test]"
+cp .env.example .env
+uvicorn backend.main:app --reload
+```
+
+The backend exposes `GET /health`, `POST /api/v1/debug`, and OpenAPI documentation at `/docs`. It uses a safe, non-executing local analysis fallback when `AI_API_URL` is unset.
+
+### Frontend
+
+In a second terminal:
+
 ```bash
 npm install
-npm run dev
+VITE_API_BASE_URL=http://localhost:8000 npm run dev
 ```
 
-The frontend reads the backend origin from `VITE_API_BASE_URL`. If it is omitted, requests use the current origin, so a local proxy or same-origin backend can handle `/api/v1/debug`.
-
-```bash
-VITE_API_BASE_URL=http://localhost:3000 npm run dev
-```
+The frontend runs on `http://localhost:5173` and sends requests to the FastAPI backend on `http://localhost:8000`.
 
 ## API contract
 
@@ -36,6 +48,7 @@ The response should contain `error_type`, `explanation`, `probable_cause`, `sugg
 ```bash
 npm run build
 npm test
+pytest
 ```
 
-No AI or backend secret belongs in the frontend. The browser only calls the backend endpoint.
+No AI or backend secret belongs in the frontend. The browser only calls the backend endpoint. Submitted code is analyzed as text only and is not stored or executed by this service.
