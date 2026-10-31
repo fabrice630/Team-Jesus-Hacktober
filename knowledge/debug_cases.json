@@ -1,0 +1,97 @@
+{
+  "library_name": "debugging_case_library",
+  "version": "0.1.0",
+  "description": "Curated debugging cases for Python and JavaScript errors.",
+  "cases": [
+    {
+      "id": "python-index-error",
+      "title": "List index out of range",
+      "language": "python",
+      "error_category": "indexing",
+      "status": "verified_human",
+      "problem_description": "The code accesses a list position that does not exist.",
+      "example_code": "numbers = [1, 2, 3]\nprint(numbers[3])",
+      "error_message": "IndexError: list index out of range",
+      "explanation": "Python lists are zero-indexed. If the list has three elements, the valid indices are 0, 1, and 2. The code tries to access index 3, which is outside the valid range.",
+      "suggested_correction": "Use a valid list index or check the list length before reading an element.",
+      "verification_steps": [
+        "Run the corrected program.",
+        "Confirm the code accesses an index that exists.",
+        "Check the expected value is returned without crashing."
+      ],
+      "source": "Python official documentation and common beginner debugging patterns."
+    },
+    {
+      "id": "python-type-error",
+      "title": "Unsupported operand type(s) for +: 'int' and 'str'",
+      "language": "python",
+      "error_category": "type_mismatch",
+      "status": "verified_human",
+      "problem_description": "The code tries to combine variables of incompatible types.",
+      "example_code": "age = 25\nmessage = 'Your age is: ' + age",
+      "error_message": "TypeError: can only concatenate str (not \"int\") to str",
+      "explanation": "The expression combines a string and an integer with the + operator. Python cannot implicitly convert the integer to a string in this context.",
+      "suggested_correction": "Convert the integer to a string before concatenating, or format the output with f-strings.",
+      "verification_steps": [
+        "Fix the type mismatch.",
+        "Run the code and confirm the output is a valid string.",
+        "Verify that no TypeError is raised."
+      ],
+      "source": "Python type system and common runtime error examples."
+    },
+    {
+      "id": "python-name-error",
+      "title": "NameError: variable is not defined",
+      "language": "python",
+      "error_category": "undefined_variable",
+      "status": "verified_human",
+      "problem_description": "The program references a variable before it has been defined or outside its scope.",
+      "example_code": "print(message)\nmessage = 'hello'",
+      "error_message": "NameError: name 'message' is not defined",
+      "explanation": "The variable is referenced before it is created. In Python, variables must be defined before they are used in the current scope.",
+      "suggested_correction": "Define the variable before using it or ensure the variable is in the correct scope.",
+      "verification_steps": [
+        "Move the variable definition before the print call.",
+        "Run the script again.",
+        "Validate that the output is expected and no NameError appears."
+      ],
+      "source": "Python variable scoping and execution order."
+    },
+    {
+      "id": "javascript-type-error",
+      "title": "Cannot read properties of undefined",
+      "language": "javascript",
+      "error_category": "null_or_undefined",
+      "status": "verified_human",
+      "problem_description": "The code tries to access a property on an undefined value.",
+      "example_code": "const user = undefined;\nconsole.log(user.name);",
+      "error_message": "TypeError: Cannot read properties of undefined (reading 'name')",
+      "explanation": "The variable user is undefined, so it does not contain an object with a name property. JavaScript cannot read a property from an undefined value.",
+      "suggested_correction": "Check whether the object exists before reading its properties, or initialize the object with a default value.",
+      "verification_steps": [
+        "Guard the access with a null or undefined check.",
+        "Run the script.",
+        "Confirm that the code handles the missing object safely."
+      ],
+      "source": "JavaScript runtime behavior for undefined and null properties."
+    },
+    {
+      "id": "javascript-reference-error",
+      "title": "Variable not defined",
+      "language": "javascript",
+      "error_category": "undefined_variable",
+      "status": "verified_human",
+      "problem_description": "The code references a variable that has not been declared in the current scope.",
+      "example_code": "console.log(totalAmount);\nconst totalAmount = 42;",
+      "error_message": "ReferenceError: totalAmount is not defined",
+      "explanation": "The script accesses totalAmount before it is declared. In JavaScript, a variable declared with const or let is not available before initialization in the same scope.",
+      "suggested_correction": "Declare the variable before it is used, or move the logic so the value is created before the access.",
+      "verification_steps": [
+        "Declare the variable before the log statement.",
+        "Run the program again.",
+        "Check that the console output matches the expected value."
+      ],
+      "source": "JavaScript scope and temporal dead zone behavior."
+    }
+  ]
+}

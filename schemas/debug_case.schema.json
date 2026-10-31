@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/debug_case.schema.json",
+  "title": "Debugging Case Library",
+  "type": "object",
+  "required": ["library_name", "version", "description", "cases"],
+  "properties": {
+    "library_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/debugCase"
+      }
+    }
+  },
+  "$defs": {
+    "debugCase": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "language",
+        "error_category",
+        "status",
+        "problem_description",
+        "example_code",
+        "error_message",
+        "explanation",
+        "suggested_correction",
+        "verification_steps",
+        "source"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "language": {
+          "type": "string",
+          "enum": ["python", "javascript", "typescript", "java", "csharp", "other"]
+        },
+        "error_category": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": ["verified_human", "verified_test", "unverified_ai"]
+        },
+        "problem_description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "example_code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "error_message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "suggested_correction": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verification_steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
