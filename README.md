@@ -52,3 +52,14 @@ pytest
 ```
 
 No AI or backend secret belongs in the frontend. The browser only calls the backend endpoint. Submitted code is analyzed as text only and is not stored or executed by this service.
+
+## Quality & Community - Phase 1
+
+The project includes a curated debugging case library used as a quality foundation for backend analysis and frontend guidance.
+
+### Current structure
+- `knowledge/` - curated debugging cases
+- `schemas/` - validation schema for the case dataset
+- `tests/` - automated checks for API and dataset integrity
+
+Each case records its validation status so unverified AI suggestions are not presented as verified corrections.
