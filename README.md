@@ -1,19 +1,70 @@
 # Team-Jesus-Hacktober
-hackathon
 
-## Quality & Community - Phase 1
+DevAid AI is a hackathon project combining:
+- a Python FastAPI backend for debugging analysis
+- a React + Vite frontend for interaction
+- a quality layer for debugging knowledge and validation
 
-This repository now includes the initial structure for the debugging test-case library and the quality layer described in Team Member 3.
+## Project structure
 
-### Current structure
+- `backend/` — FastAPI application and debugging service
 - `knowledge/` — curated debugging cases and knowledge entries
-- `schemas/` — validation schema for the case dataset
-- `tests/` — automated checks for the dataset integrity
-- `docs/` — contribution and quality guidance
+- `schemas/` — JSON schema for the debugging library
+- `src/` — frontend app
+- `tests/` — backend and quality tests
 
-### Goal of this phase
-The objective is to create a verifiable, searchable knowledge base that distinguishes:
-- AI-generated suggestions that are not independently validated
-- corrections that have been reviewed or tested by a human
+## Backend
 
-This creates a safer foundation for the backend AI endpoint and the frontend UX.
+```bash
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[test]"
+cp .env.example .env
+uvicorn backend.main:app --reload
+pytest
+```
+
+## Frontend
+
+```bash
+npm install
+npm run dev
+```
+
+## Environment
+
+The frontend reads `VITE_API_BASE_URL`. The backend uses `.env` variables from `.env.example` and allows AI integration via an OpenAI-compatible provider.
+
+## Quality & Community
+
+The knowledge library stores verified and unverified debugging cases. It helps distinguish AI suggestions from corrections that have been tested or reviewed.
+
+## API contract
+
+`POST /api/v1/debug`
+
+Request:
+
+```json
+{
+  "language": "python",
+  "code": "items = []\nprint(items[0])",
+  "error_message": "IndexError: list index out of range",
+  "description": "Explain and fix this error",
+  "response_language": "en"
+}
+```
+
+Response:
+
+```json
+{
+  "error_type": "IndexError",
+  "explanation": "The requested index does not exist in the sequence.",
+  "probable_cause": "The code accesses a position outside the valid bounds.",
+  "suggested_correction": "Use a valid index or check the length before accessing it.",
+  "corrected_code": "items = []\nprint(items[0])",
+  "verification_steps": ["Run the corrected code."],
+  "warnings": ["AI suggestions must be verified before use."]
+}
+```
