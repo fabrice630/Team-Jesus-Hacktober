@@ -8,7 +8,8 @@ client = TestClient(app)
 def test_health() -> None:
     response = client.get("/health")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok"}
+    assert response.json()["ok"] is True
+    assert response.json()["data"]["status"] == "ok"
 
 
 def test_debug_returns_structured_dynamic_result() -> None:
@@ -56,6 +57,7 @@ def test_invalid_language_has_consistent_error() -> None:
         },
     )
     assert response.status_code == 422
+    assert response.json()["ok"] is False
     assert response.json()["error"]["code"] == "validation_error"
 
 
@@ -70,4 +72,5 @@ def test_blank_code_is_rejected() -> None:
         },
     )
     assert response.status_code == 422
+    assert response.json()["ok"] is False
     assert response.json()["error"]["code"] == "validation_error"

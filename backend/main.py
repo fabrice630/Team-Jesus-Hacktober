@@ -3,15 +3,16 @@ from __future__ import annotations
 import os
 import time
 from collections import defaultdict, deque
-from typing import ASGIApp, Awaitable, Callable
+from typing import Awaitable, Callable
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from starlette.types import Message, Receive, Scope, Send
+from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
+from backend.communication import api_error
 from backend.routes import router
 from backend.services import ProviderError
 
@@ -37,7 +38,7 @@ class RequestLimitMiddleware:
                 if int(content_length) > self.max_bytes:
                     response = JSONResponse(
                         status_code=413,
-                        content={"error": {"code": "payload_too_large", "message": "Request body is too large."}},
+                        content=api_error("payload_too_large", "Request body is too large."),
                     )
                     await response(scope, receive, send)
                     return
@@ -60,7 +61,7 @@ class RequestLimitMiddleware:
         except RequestTooLargeError:
             response = JSONResponse(
                 status_code=413,
-                content={"error": {"code": "payload_too_large", "message": "Request body is too large."}},
+                content=api_error("payload_too_large", "Request body is too large."),
             )
             await response(scope, receive, send)
 
@@ -91,7 +92,7 @@ class RateLimitMiddleware:
             response = JSONResponse(
                 status_code=429,
                 headers={"Retry-After": str(self.window_seconds)},
-                content={"error": {"code": "rate_limited", "message": "Too many debug requests. Try again later."}},
+                content=api_error("rate_limited", "Too many debug requests. Try again later."),
             )
             await response(scope, receive, send)
             return
@@ -123,13 +124,11 @@ app.include_router(router)
 async def validation_exception_handler(_: Request, exc: RequestValidationError) -> JSONResponse:
     return JSONResponse(
         status_code=422,
-        content={
-            "error": {
-                "code": "validation_error",
-                "message": "Request validation failed.",
-                "details": jsonable_encoder(exc.errors()),
-            }
-        },
+        content=api_error(
+            "validation_error",
+            "Request validation failed.",
+            jsonable_encoder(exc.errors()),
+        ),
     )
 
 
@@ -137,7 +136,7 @@ async def validation_exception_handler(_: Request, exc: RequestValidationError) 
 async def provider_exception_handler(_: Request, exc: ProviderError) -> JSONResponse:
     return JSONResponse(
         status_code=503,
-        content={"error": {"code": "ai_service_unavailable", "message": str(exc)}},
+        content=api_error("ai_service_unavailable", str(exc)),
     )
 
 
@@ -145,5 +144,5 @@ async def provider_exception_handler(_: Request, exc: ProviderError) -> JSONResp
 async def unexpected_exception_handler(_: Request, __: Exception) -> JSONResponse:
     return JSONResponse(
         status_code=500,
-        content={"error": {"code": "internal_error", "message": "An unexpected server error occurred."}},
+        content=api_error("internal_error", "An unexpected server error occurred."),
     )
