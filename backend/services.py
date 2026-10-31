@@ -24,6 +24,18 @@ class DebuggerService:
     async def _analyze_with_provider(self, request: DebugRequest) -> DebugResponse:
         url = os.environ["AI_API_URL"]
         timeout = float(os.getenv("AI_TIMEOUT_SECONDS", "15"))
+
+        if self._is_gemini_url(url):
+            return await self._analyze_with_gemini(request, url, timeout)
+
+        return await self._analyze_with_openai_compatible(request, url, timeout)
+
+    @staticmethod
+    def _is_gemini_url(url: str) -> bool:
+        lowered = url.lower()
+        return "generativelanguage.googleapis.com" in lowered or "gemini" in lowered
+
+    async def _analyze_with_openai_compatible(self, request: DebugRequest, url: str, timeout: float) -> DebugResponse:
         payload = {
             "model": os.getenv("AI_MODEL", "default"),
             "temperature": 0.1,
@@ -58,6 +70,42 @@ class DebuggerService:
             return DebugResponse.model_validate(content)
         except (KeyError, IndexError, TypeError, json.JSONDecodeError, ValidationError) as exc:
             raise ProviderError("The AI provider returned an invalid response.") from exc
+
+    async def _analyze_with_gemini(self, request: DebugRequest, url: str, timeout: float) -> DebugResponse:
+        api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("AI_API_KEY")
+        if not api_key:
+            raise ProviderError("Google API key is missing. Configure GOOGLE_API_KEY or AI_API_KEY.")
+
+        gemini_url = url.rstrip("/")
+        if "key=" not in gemini_url.lower():
+            gemini_url = f"{gemini_url}?key={api_key}"
+
+        payload = {
+            "contents": [{"parts": [{"text": self._prompt(request)}]}],
+            "generationConfig": {
+                "temperature": 0.1,
+                "responseMimeType": "application/json",
+            },
+        }
+
+        try:
+            async with httpx.AsyncClient(timeout=timeout) as client:
+                response = await client.post(gemini_url, json=payload, headers={"Content-Type": "application/json"})
+                response.raise_for_status()
+                body = response.json()
+        except (httpx.HTTPError, ValueError) as exc:
+            raise ProviderError("The configured Gemini provider is unavailable.") from exc
+
+        try:
+            raw_text = body["candidates"][0]["content"]["parts"][0]["text"]
+            cleaned = raw_text.strip()
+            if cleaned.startswith("```"):
+                cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned, flags=re.IGNORECASE)
+                cleaned = re.sub(r"\s*```\s*$", "", cleaned)
+            content = json.loads(cleaned)
+            return DebugResponse.model_validate(content)
+        except (KeyError, IndexError, TypeError, json.JSONDecodeError, ValidationError) as exc:
+            raise ProviderError("The Gemini provider returned an invalid response.") from exc
 
     @staticmethod
     def _prompt(request: DebugRequest) -> str:
