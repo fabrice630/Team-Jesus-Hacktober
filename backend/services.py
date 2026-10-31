@@ -42,7 +42,7 @@ class DebuggerService:
         headers = {}
         api_key = os.getenv("AI_API_KEY")
         if api_key:
-            headers["Authorization"] = f"Bearer {api_key}"
+            headers["Authorization"] = "Bearer " + api_key
         try:
             async with httpx.AsyncClient(timeout=timeout) as client:
                 response = await client.post(url, json=payload, headers=headers)
