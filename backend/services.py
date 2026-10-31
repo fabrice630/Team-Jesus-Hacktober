@@ -63,8 +63,8 @@ class DebuggerService:
     def _prompt(request: DebugRequest) -> str:
         return (
             "Analyze this debugging request without executing the code. Respond with JSON keys "
-            "error_type, explanation, probable_cause, suggested_fix, corrected_code, "
-            "verification_steps, limitations. Preserve the requested response language.\n\n"
+            "error_type, explanation, probable_cause, suggested_correction, corrected_code, "
+            "verification_steps, warnings. Preserve the requested response language.\n\n"
             f"Language: {request.language}\nCode:\n{request.code}\n"
             f"Error: {request.error_message}\nRequest: {request.description}\n"
             f"Response language: {request.response_language}"
@@ -109,10 +109,10 @@ class DebuggerService:
             error_type=error_name,
             explanation=explanation,
             probable_cause=cause,
-            suggested_fix=fix,
+            suggested_correction=fix,
             corrected_code=DebuggerService._corrected_code(request, error_name),
             verification_steps=[verification],
-            limitations=[
+            warnings=[
                 "La suggestion n'exécute pas le code et doit être vérifiée avant utilisation."
                 if french
                 else "The suggestion does not execute the code and must be verified before use."

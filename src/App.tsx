@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { analyzeDebugRequest } from './api';
 import type { DebugResponse, ResponseLanguage } from './types';
 
-const languages = ['JavaScript', 'TypeScript', 'Python', 'Java', 'C#', 'Go', 'Rust'];
+const languages = ['JavaScript', 'Python'];
 const MAX_CODE_LENGTH = 20_000;
 const MAX_ERROR_LENGTH = 2_000;
 
@@ -26,7 +26,7 @@ function App() {
   const [copied, setCopied] = useState('');
   const [isDark, setIsDark] = useState(false);
 
-  const canSubmit = Boolean(code.trim() && errorMessage.trim() && !isLoading);
+  const canSubmit = !isLoading;
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();

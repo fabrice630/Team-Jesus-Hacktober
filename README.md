@@ -11,7 +11,7 @@ python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[test]"
 cp .env.example .env
-uvicorn backend.main:app --reload
+uvicorn backend.main:app --reload --env-file .env
 ```
 
 The backend exposes `GET /health`, `POST /api/v1/debug`, and OpenAPI documentation at `/docs`. It uses a safe, non-executing local analysis fallback when `AI_API_URL` is unset.

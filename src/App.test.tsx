@@ -1,13 +1,16 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
 
 describe('DevAid AI debugging workspace', () => {
-  afterEach(() => vi.restoreAllMocks());
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
 
   it('prevents an empty submission and explains what is missing', () => {
     render(<App />);
-    fireEvent.change(screen.getByLabelText('Your code'), { target: { value: '' } });
+    fireEvent.change(screen.getByLabelText(/Your code/), { target: { value: '' } });
     fireEvent.click(screen.getByRole('button', { name: /analyze error/i }));
     expect(screen.getByRole('alert')).toHaveTextContent('Add both the code and the error message');
   });

@@ -27,14 +27,14 @@ def test_debug_returns_structured_dynamic_result() -> None:
     assert body["error_type"] == "IndexError"
     assert body["explanation"]
     assert body["verification_steps"]
-    assert body["limitations"]
+    assert body["warnings"]
 
 
 def test_debug_supports_javascript_and_french() -> None:
     response = client.post(
         "/api/v1/debug",
         json={
-            "language": "javascript",
+            "language": "JavaScript",
             "code": "console.log(value);",
             "error_message": "ReferenceError: value is not defined",
             "description": "Explique cette erreur",
