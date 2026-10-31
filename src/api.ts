@@ -1,4 +1,41 @@
-import type { DebugRequest, DebugResponse } from './types';
+type ApiErrorEnvelope = {
+  ok?: boolean;
+  error?: {
+    code?: string;
+    message?: string;
+    details?: unknown;
+  };
+};
+
+function getErrorMessage(payload: unknown, fallback: string): string {
+  if (!payload || typeof payload !== 'object') {
+    return fallback;
+  }
+
+  const envelope = payload as ApiErrorEnvelope;
+  if (envelope.error && typeof envelope.error.message === 'string' && envelope.error.message.trim()) {
+    return envelope.error.message;
+  }
+
+  if (typeof (payload as { message?: string }).message === 'string' && (payload as { message?: string }).message!.trim()) {
+    return (payload as { message?: string }).message!;
+  }
+
+  return fallback;
+}
+
+function normalizeResponsePayload(payload: unknown): Record<string, unknown> {
+  if (!payload || typeof payload !== 'object') {
+    return {};
+  }
+
+  const data = payload as Record<string, unknown>;
+  if ('data' in data && data.data && typeof data.data === 'object') {
+    return data.data as Record<string, unknown>;
+  }
+
+  return data;
+}
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '');
 const REQUEST_TIMEOUT_MS = 15_000;
@@ -16,7 +53,7 @@ export function validateDebugResponse(payload: unknown): DebugResponse {
     throw new Error('The API returned an invalid response.');
   }
 
-  const response = payload as Record<string, unknown>;
+  const response = normalizeResponsePayload(payload) as Record<string, unknown>;
   return {
     error_type: asString(response.error_type, 'Unclassified error'),
     explanation: asString(response.explanation, 'No explanation was provided.'),
@@ -44,11 +81,13 @@ export async function analyzeDebugRequest(request: DebugRequest): Promise<DebugR
       throw new Error('The service is busy right now. Please wait a moment and try again.');
     }
 
+    const payload = await response.json().catch(() => null);
+
     if (!response.ok) {
-      throw new Error(`The analysis failed with status ${response.status}.`);
+      throw new Error(getErrorMessage(payload, `The analysis failed with status ${response.status}.`));
     }
 
-    return validateDebugResponse(await response.json());
+    return validateDebugResponse(payload);
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') {
       throw new Error('The request took too long. Check your connection and try again.');
