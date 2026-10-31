@@ -1,7 +1,7 @@
 {
   "library_name": "debugging_case_library",
-  "version": "0.1.0",
-  "description": "Curated debugging cases for Python and JavaScript errors.",
+  "version": "0.2.0",
+  "description": "Curated debugging cases for common Python and JavaScript runtime and validation errors.",
   "cases": [
     {
       "id": "python-index-error",
@@ -58,6 +58,60 @@
       "source": "Python variable scoping and execution order."
     },
     {
+      "id": "python-value-error",
+      "title": "Invalid literal for int() with base 10",
+      "language": "python",
+      "error_category": "invalid_input",
+      "status": "verified_human",
+      "problem_description": "The program tries to convert a non-numeric string into an integer.",
+      "example_code": "value = int('abc')",
+      "error_message": "ValueError: invalid literal for int() with base 10: 'abc'",
+      "explanation": "The int() function expects digits only. A string such as 'abc' cannot be converted to an integer without a custom parsing rule.",
+      "suggested_correction": "Validate the input before conversion and handle invalid user input explicitly.",
+      "verification_steps": [
+        "Validate the input string before calling int().",
+        "Run the code with valid data and invalid data.",
+        "Check that invalid input triggers a controlled error message instead of crashing."
+      ],
+      "source": "Python conversion errors and input validation practices."
+    },
+    {
+      "id": "python-attribute-error",
+      "title": "AttributeError: 'str' object has no attribute 'append'",
+      "language": "python",
+      "error_category": "attribute_mismatch",
+      "status": "verified_human",
+      "problem_description": "The code calls a method that does not exist on the current object type.",
+      "example_code": "text = 'hello'\ntext.append(' world')",
+      "error_message": "AttributeError: 'str' object has no attribute 'append'",
+      "explanation": "Strings do not have an append method. The code is trying to use a list-like operation on a string, which is not supported.",
+      "suggested_correction": "Use the correct operation for the object type, such as string concatenation or a list if appending is required.",
+      "verification_steps": [
+        "Check the object type before calling the method.",
+        "Use the correct operation for strings or lists.",
+        "Confirm the behavior matches the intended data structure."
+      ],
+      "source": "Python object types and attribute access behavior."
+    },
+    {
+      "id": "python-none-handling",
+      "title": "NoneType has no attribute or invalid output",
+      "language": "python",
+      "error_category": "missing_value",
+      "status": "verified_human",
+      "problem_description": "A value is missing or null-like and is later used as if it were a valid object.",
+      "example_code": "profile = None\nprint(profile.name)",
+      "error_message": "AttributeError: 'NoneType' object has no attribute 'name'",
+      "explanation": "The variable profile is set to None, which means there is no object behind it. The code assumes a valid object and tries to access a property that does not exist.",
+      "suggested_correction": "Guard against missing values and return a sensible fallback before dereferencing the object.",
+      "verification_steps": [
+        "Check whether the value is None before using it.",
+        "Handle the missing case explicitly.",
+        "Verify the fallback behavior in user-facing code paths."
+      ],
+      "source": "Null and missing-value handling in Python applications."
+    },
+    {
       "id": "javascript-type-error",
       "title": "Cannot read properties of undefined",
       "language": "javascript",
@@ -92,6 +146,60 @@
         "Check that the console output matches the expected value."
       ],
       "source": "JavaScript scope and temporal dead zone behavior."
+    },
+    {
+      "id": "javascript-null-handling",
+      "title": "Cannot read properties of null",
+      "language": "javascript",
+      "error_category": "null_or_undefined",
+      "status": "verified_human",
+      "problem_description": "The code dereferences a null value expecting an object or array.",
+      "example_code": "const config = null;\nconsole.log(config.timeout);",
+      "error_message": "TypeError: Cannot read properties of null (reading 'timeout')",
+      "explanation": "The configuration object is null, so the code cannot access a property on it. The fix is to guard against null before reading properties.",
+      "suggested_correction": "Check for null before reading properties or provide a default fallback object.",
+      "verification_steps": [
+        "Add a null guard before reading timeout.",
+        "Run the code with and without config.",
+        "Confirm that the default fallback is used safely."
+      ],
+      "source": "JavaScript null handling and defensive coding patterns."
+    },
+    {
+      "id": "javascript-malformed-request",
+      "title": "Malformed request payload",
+      "language": "javascript",
+      "error_category": "invalid_input",
+      "status": "verified_human",
+      "problem_description": "The application receives a payload without the required field, causing a downstream failure.",
+      "example_code": "const payload = { name: 'Alice' };\nconst age = payload.age.toString();",
+      "error_message": "TypeError: Cannot read properties of undefined (reading 'toString')",
+      "explanation": "The request payload is missing a required field. The code assumes age is present and attempts to call a method on undefined.",
+      "suggested_correction": "Validate the payload before accessing nested fields and provide a clear error message for malformed input.",
+      "verification_steps": [
+        "Check that required keys exist before use.",
+        "Add a validation guard for malformed payloads.",
+        "Confirm the app returns a meaningful validation error instead of crashing."
+      ],
+      "source": "Defensive validation patterns for API payloads."
+    },
+    {
+      "id": "python-invalid-input",
+      "title": "Input validation failure",
+      "language": "python",
+      "error_category": "invalid_input",
+      "status": "verified_human",
+      "problem_description": "A user passes malformed input to a function that requires a stricter dataset.",
+      "example_code": "def divide(a, b):\n    return a / b\n\nprint(divide(10, 0))",
+      "error_message": "ZeroDivisionError: division by zero",
+      "explanation": "The function accepts a division by zero scenario without validating its arguments. This must be rejected before calculation.",
+      "suggested_correction": "Validate arguments and fail gracefully when a divisor is zero or invalid.",
+      "verification_steps": [
+        "Add validation for the divisor.",
+        "Test with 0 and non-zero values.",
+        "Ensure the function returns a controlled result or error instead of crashing."
+      ],
+      "source": "Input validation and safe function guards."
     }
   ]
 }
